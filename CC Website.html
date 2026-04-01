@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CC – Connecting Cultures, Continents, Countries & Communities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #3D2B1F; --blue-mid: #6B3A28; --gold: #D46B2A;
+    --sand: #F5ECD8; --green: #8B9E5A; --white: #FDFAF5;
+    --text: #2A1A10; --text-light: #7A5C48;
+    --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--text); overflow-x: hidden; }
+
+  /* LANGUAGE BAR */
+  .lang-bar { position: fixed; top: 0; right: 0; z-index: 1000; display: flex; background: var(--blue); padding: 8px 24px; border-bottom-left-radius: 12px; }
+  .lang-bar button { background: none; border: none; color: rgba(255,255,255,0.5); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; letter-spacing: 0.1em; cursor: pointer; padding: 4px 10px; transition: color 0.2s; border-right: 1px solid rgba(255,255,255,0.15); }
+  .lang-bar button:last-child { border-right: none; }
+  .lang-bar button.active, .lang-bar button:hover { color: var(--gold); }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 900; display: flex; align-items: center; justify-content: space-between; padding: 20px 60px; transition: background var(--transition), padding var(--transition); }
+  nav.scrolled { background: rgba(61,43,31,0.97); backdrop-filter: blur(12px); padding: 14px 60px; box-shadow: 0 2px 40px rgba(0,0,0,0.25); }
+  .nav-logo { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .logo-mark { width: 44px; height: 44px; flex-shrink: 0; }
+  .nav-logo-text { color: white; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+  .cc-gold { color: var(--gold); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; position: relative; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--gold); transition: width 0.3s; }
+  .nav-links a:hover { color: white; }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero { min-height: 100vh; background: var(--blue); position: relative; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+  #hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(212,107,42,0.2) 0%, transparent 60%), radial-gradient(ellipse 40% 60% at 10% 80%, rgba(196,57,26,0.2) 0%, transparent 50%); }
+  .hero-geo { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .hero-geo svg { position: absolute; right: -80px; top: -80px; width: 70%; height: 100%; opacity: 0.06; }
+  .hero-content { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: center; padding: 140px 60px 100px; }
+  .hero-eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(48px,6vw,82px); font-weight: 900; line-height: 1.1; color: white; margin-bottom: 24px; opacity: 0; animation: fadeUp 0.8s 0.5s forwards; }
+
+  /* ROTATING WORD */
+  .rotating-wrap { display: block; position: relative; height: 1.15em; overflow: visible; }
+  .rot-word { display: inline-block; color: var(--gold); position: absolute; left: 0; bottom: 0; white-space: nowrap; opacity: 0; transform: translateY(110%); transition: opacity 0.45s ease, transform 0.45s ease; }
+  .rot-word.show { opacity: 1; transform: translateY(0); }
+  .rot-word.hide { opacity: 0; transform: translateY(-110%); }
+
+  .hero-tagline { font-size: clamp(15px,1.8vw,19px); font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 48px; max-width: 520px; opacity: 0; animation: fadeUp 0.8s 0.7s forwards; }
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; opacity: 0; animation: fadeUp 0.8s 0.9s forwards; }
+  .btn-primary { background: var(--gold); color: var(--blue); padding: 14px 32px; border: none; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; display: inline-block; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(196,154,60,0.4); }
+  .btn-outline { background: transparent; color: white; padding: 14px 32px; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(196,154,60,0.1); }
+  .hero-visual { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 140px 60px 100px 0; opacity: 0; animation: fadeIn 1.2s 0.6s forwards; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* ABOUT */
+  #about { padding: 120px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-label { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 20px; }
+  .about-title { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 700; line-height: 1.15; color: var(--blue); margin-bottom: 28px; }
+  .about-body { font-size: 16px; line-height: 1.85; color: var(--text-light); margin-bottom: 24px; }
+  .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+  .stat-card { padding: 28px 24px; background: var(--sand); border-radius: 8px; border-left: 3px solid var(--gold); }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 900; color: var(--blue); line-height: 1; margin-bottom: 8px; }
+  .stat-desc { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+  .about-visual { position: relative; height: 460px; background: var(--blue); border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .about-visual::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 40%, rgba(196,154,60,0.25) 0%, transparent 65%); }
+  .regions-list { position: relative; z-index: 2; width: 100%; }
+  .region-item { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 14px 32px; color: rgba(255,255,255,0.85); font-size: 15px; letter-spacing: 0.08em; font-weight: 300; border-bottom: 1px solid rgba(255,255,255,0.08); transition: all 0.3s; }
+  .region-item:hover { background: rgba(196,154,60,0.15); color: white; }
+  .region-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+
+  /* TEAM */
+  #team { padding: 120px 60px; background: var(--sand); }
+  .section-header { text-align: center; margin-bottom: 72px; }
+  .section-label { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 16px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 700; color: var(--blue); line-height: 1.2; }
+  .team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 28px; max-width: 900px; margin: 0 auto; }
+  .team-card { background: white; border-radius: 10px; overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+  .team-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(61,43,31,0.12); }
+  .team-card-header { background: var(--blue); padding: 36px 28px 28px; position: relative; overflow: hidden; }
+  .team-card-header::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; border-radius: 50%; border: 30px solid rgba(212,107,42,0.15); }
+  .team-avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--blue); margin-bottom: 16px; position: relative; z-index: 1; }
+  .team-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: white; margin-bottom: 6px; position: relative; z-index: 1; }
+  .team-role { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); position: relative; z-index: 1; }
+  .team-card-body { padding: 24px 28px; }
+  .team-bio { font-size: 14px; line-height: 1.75; color: var(--text-light); }
+  .fellows-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; max-width: 1200px; margin: 48px auto 0; }
+  .fellow-card { background: white; border-radius: 8px; padding: 24px; border-top: 2px solid var(--gold); transition: transform 0.3s; }
+  .fellow-card:hover { transform: translateY(-4px); }
+  .fellow-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+  .fellow-role { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .fellow-bio { font-size: 13px; line-height: 1.65; color: var(--text-light); }
+
+  /* PROJECTS */
+  #projects { padding: 120px 60px; background: var(--white); }
+  .projects-intro { font-size: 15px; color: var(--text-light); line-height: 1.7; max-width: 760px; margin: 0 auto 52px; text-align: center; font-style: italic; }
+  .projects-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; max-width: 1200px; margin: 0 auto 60px; }
+  .project-card { border-radius: 10px; overflow: hidden; background: var(--blue); position: relative; min-height: 340px; display: flex; flex-direction: column; justify-content: flex-end; transition: transform 0.3s; }
+  .project-card:hover { transform: scale(1.02); }
+  .project-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(61,43,31,0.96) 0%, rgba(61,43,31,0.3) 60%, transparent 100%); }
+  .project-bg { position: absolute; inset: 0; opacity: 0.35; }
+  .project-bg-1 { background: radial-gradient(ellipse at 30% 50%, #D46B2A 0%, #8B9E5A 100%); }
+  .project-bg-2 { background: radial-gradient(ellipse at 70% 30%, #C4391A 0%, #D46B2A 100%); }
+  .project-bg-3 { background: radial-gradient(ellipse at 50% 70%, #8B9E5A 0%, #3D2B1F 100%); }
+  .project-content { position: relative; z-index: 1; padding: 32px; }
+  .project-tag { display: inline-block; background: var(--gold); color: var(--blue); font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 14px; }
+  .project-lead { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; margin-bottom: 8px; }
+  .project-lead span { color: rgba(255,255,255,0.75); }
+  .project-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; line-height: 1.3; margin-bottom: 10px; }
+  .project-desc { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 16px; }
+  .project-link { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font-size: 12px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; transition: gap 0.2s; }
+  .project-link:hover { gap: 12px; }
+  .publications-list { max-width: 900px; margin: 0 auto; }
+  .pub-item { padding: 24px 0; border-bottom: 1px solid rgba(0,0,0,0.08); display: grid; grid-template-columns: auto 1fr; gap: 24px; }
+  .pub-year { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--gold); width: 48px; padding-top: 2px; }
+  .pub-title { font-size: 15px; font-weight: 500; color: var(--blue); line-height: 1.5; margin-bottom: 6px; }
+  .pub-meta { font-size: 13px; color: var(--text-light); }
+
+  /* CONTACT */
+  #contact { padding: 120px 60px; background: var(--blue); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .contact-title { font-family: 'Playfair Display', serif; font-size: clamp(32px,4vw,52px); font-weight: 700; color: white; line-height: 1.2; margin-bottom: 28px; }
+  .contact-desc { font-size: 16px; line-height: 1.8; color: rgba(255,255,255,0.6); margin-bottom: 48px; }
+  .contact-info-item { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 28px; }
+  .contact-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(212,107,42,0.15); border: 1px solid rgba(212,107,42,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--gold); font-size: 16px; }
+  .contact-detail-label { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  .contact-detail-value { font-size: 15px; color: rgba(255,255,255,0.85); line-height: 1.5; }
+  .contact-detail-value a { color: inherit; text-decoration: none; }
+  .contact-detail-value a:hover { color: var(--gold); }
+  .contact-form { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 44px; }
+  .form-group { margin-bottom: 24px; }
+  .form-label { display: block; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+  .form-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 14px 18px; color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; transition: border-color 0.2s; }
+  .form-input::placeholder { color: rgba(255,255,255,0.25); }
+  .form-input:focus { border-color: var(--gold); }
+  .form-select { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 14px 18px; color: white; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; cursor: pointer; -webkit-appearance: none; }
+  .form-select option { background: var(--blue); }
+  textarea.form-input { resize: vertical; min-height: 120px; }
+
+  /* FOOTER */
+  footer { background: #1E100A; padding: 48px 60px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; }
+  .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: white; }
+  .footer-logo span { color: var(--gold); }
+  .footer-links { display: flex; gap: 32px; list-style: none; }
+  .footer-links a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-copy { color: rgba(255,255,255,0.25); font-size: 12px; }
+
+  /* SCROLL FADE */
+  .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; } nav.scrolled { padding: 14px 24px; }
+    .nav-links { display: none; }
+    #hero { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .hero-content { padding: 120px 24px 80px; }
+    #about { grid-template-columns: 1fr; padding: 80px 24px; gap: 40px; }
+    .about-visual { height: 280px; }
+    #team { padding: 80px 24px; }
+    .team-grid { grid-template-columns: 1fr; }
+    .fellows-grid { grid-template-columns: 1fr; }
+    #projects { padding: 80px 24px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    #contact { grid-template-columns: 1fr; padding: 80px 24px; gap: 48px; }
+    footer { flex-direction: column; padding: 36px 24px; align-items: flex-start; }
+    .footer-links { flex-wrap: wrap; gap: 16px; }
+    .lang-bar { padding: 8px 12px; }
+    .lang-bar button { padding: 4px 7px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lang-bar">
+  <button onclick="setLang('en')" id="btn-en">EN</button>
+  <button onclick="setLang('fr')" id="btn-fr">FR</button>
+  <button onclick="setLang('de')" id="btn-de">DE</button>
+  <button onclick="setLang('ar')" id="btn-ar">عر</button>
+</div>
+
+<nav id="mainNav">
+  <a href="#hero" class="nav-logo">
+    <svg class="logo-mark" viewBox="0 0 44 44" fill="none">
+      <circle cx="22" cy="22" r="20" stroke="#D46B2A" stroke-width="1.5" opacity="0.5"/>
+      <path d="M26 10 A13 13 0 0 0 26 34" stroke="#D46B2A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M18 10 A13 13 0 0 1 18 34" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    </svg>
+    <span class="nav-logo-text"><span class="cc-gold">CC</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about" id="nav-about">About</a></li>
+    <li><a href="#team" id="nav-team">Team</a></li>
+    <li><a href="#projects" id="nav-projects">Projects</a></li>
+    <li><a href="#contact" id="nav-contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-geo">
+    <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="400" cy="400" r="350" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle cx="400" cy="400" r="250" fill="none" stroke="white" stroke-width="0.5"/>
+      <circle cx="400" cy="400" r="150" fill="none" stroke="white" stroke-width="0.5"/>
+      <line x1="50" y1="400" x2="750" y2="400" stroke="white" stroke-width="0.5"/>
+      <line x1="400" y1="50" x2="400" y2="750" stroke="white" stroke-width="0.5"/>
+      <line x1="153" y1="153" x2="647" y2="647" stroke="white" stroke-width="0.5"/>
+      <line x1="647" y1="153" x2="153" y2="647" stroke="white" stroke-width="0.5"/>
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="hero-eyebrow">Independent Consultancy &amp; Think Tank</div>
+    <h1 class="hero-title">
+      <span class="cc-gold">CC</span><br>
+      <span id="hero-connecting">Connecting</span><br>
+      <span class="rotating-wrap">
+        <span class="rot-word" id="rotWord">Cultures</span>
+      </span>
+    </h1>
+    <p class="hero-tagline" id="hero-tagline">Bridging academic research and practical project management across politics, civil society, and media in the Mediterranean, MENA region, and the Sahel.</p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary" id="btn-work">Our Work</a>
+      <a href="#contact" class="btn-outline" id="btn-touch">Get in Touch</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <svg viewBox="0 0 400 400" width="360" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="200" cy="200" r="185" stroke="rgba(212,107,42,0.2)" stroke-width="1"/>
+      <circle cx="200" cy="200" r="155" stroke="rgba(212,107,42,0.12)" stroke-width="1"/>
+      <path d="M230 60 A145 145 0 0 0 230 340" stroke="#D46B2A" stroke-width="22" stroke-linecap="round" fill="none"/>
+      <path d="M170 60 A145 145 0 0 1 170 340" stroke="rgba(255,255,255,0.9)" stroke-width="22" stroke-linecap="round" fill="none"/>
+      <circle cx="200" cy="200" r="8" fill="#D46B2A"/>
+    </svg>
+  </div>
+</section>
+
+<section id="about">
+  <div class="fade-in">
+    <div class="about-label" id="about-label">Who We Are</div>
+    <h2 class="about-title" id="about-title">A Highly Competent Consultancy at the Crossroads of Cultures</h2>
+    <p class="about-body" id="about-body1">CC (formerly Jasmine Conseils) bridges academic research and practical project management across politics, civil society, and media. We work at the intersection of geopolitics, digital innovation, and intercultural dialogue to deliver real impact across the Euro-Mediterranean region.</p>
+    <p class="about-body" id="about-body2">From countering disinformation to empowering youth and strengthening civil society networks, our expertise spans policy analysis, cross-cultural engagement, and digital innovation across the Mediterranean, MENA, and Sahel regions.</p>
+    <div class="about-stats">
+      <div class="stat-card"><div class="stat-num">5+</div><div class="stat-desc" id="stat1">Associate Research Fellows</div></div>
+      <div class="stat-card"><div class="stat-num">3</div><div class="stat-desc" id="stat2">Active International Projects</div></div>
+      <div class="stat-card"><div class="stat-num">3</div><div class="stat-desc" id="stat3">Regions: Mediterranean · MENA · Sahel</div></div>
+      <div class="stat-card"><div class="stat-num">EU</div><div class="stat-desc" id="stat4">Funded Projects incl. German Foreign Office</div></div>
+    </div>
+  </div>
+  <div class="fade-in">
+    <div class="about-visual">
+      <div class="regions-list">
+        <div class="region-item"><div class="region-dot"></div>Mediterranean Region</div>
+        <div class="region-item"><div class="region-dot"></div>MENA</div>
+        <div class="region-item"><div class="region-dot"></div>Sahel</div>
+        <div class="region-item"><div class="region-dot"></div>France · Germany · Spain</div>
+        <div class="region-item"><div class="region-dot"></div>Syria · Jordan</div>
+        <div class="region-item"><div class="region-dot"></div>Libya · Tunisia · Niger</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <div class="section-header fade-in">
+    <div class="section-label" id="team-label">Our People</div>
+    <h2 class="section-title" id="team-title">Leadership &amp; Core Team</h2>
+  </div>
+  <div class="team-grid">
+    <div class="team-card fade-in">
+      <div class="team-card-header">
+        <div class="team-avatar">AE</div>
+        <div class="team-name">Dr. Asiem El Difraoui</div>
+        <div class="team-role" id="role-asiem">Founder &amp; Director</div>
+      </div>
+      <div class="team-card-body">
+        <p class="team-bio" id="bio-asiem">Political scientist and award-winning journalist specialising in propaganda and disinformation. Author of a doctoral thesis on jihadist propaganda; co-author of the Arab Media Handbook. Active in EuroMeSCo for many years.</p>
+      </div>
+    </div>
+    <div class="team-card fade-in">
+      <div class="team-card-header">
+        <div class="team-avatar">VS</div>
+        <div class="team-name">Verena Schad</div>
+        <div class="team-role" id="role-verena">Programme Manager</div>
+      </div>
+      <div class="team-card-body">
+        <p class="team-bio" id="bio-verena">Communications expert and journalist with experience in reputation, crisis, and change management. Formerly worked on Germany's international image and in MENA/Sahel project coordination.</p>
+      </div>
+    </div>
+  </div>
+  <div class="section-header fade-in" style="margin-top:72px;margin-bottom:36px;">
+    <div class="section-label" id="fellows-label">Associate Fellows</div>
+  </div>
+  <div class="fellows-grid">
+    <div class="fellow-card fade-in">
+      <div class="fellow-name">Abdullatif Sleibi</div>
+      <div class="fellow-role" id="frole1">Senior Data Analyst, PAX</div>
+      <p class="fellow-bio" id="fbio1">Specialising in online mis/disinformation, extremism, AI regulation, and Protection of Civilians policies. Contributor to media literacy projects with the European Institute of the Mediterranean.</p>
+    </div>
+    <div class="fellow-card fade-in">
+      <div class="fellow-name">Guillaume Soto-Mayor</div>
+      <div class="fellow-role" id="frole2">President, Egregor</div>
+      <p class="fellow-bio" id="fbio2">Expert in political and security issues in Africa and Europe, with field research on religious, social violence, disinformation, and hate speech.</p>
+    </div>
+    <div class="fellow-card fade-in">
+      <!-- FIX a): Dr. title added for Elise Bernard -->
+      <div class="fellow-name">Dr. Elise Bernard</div>
+      <div class="fellow-role" id="frole3">ESSEC – Geopolitics Chair</div>
+      <p class="fellow-bio" id="fbio3">Doctor in public law (Sorbonne Paris III), expert for international organisations since 2021, member of a CNRS scientific committee.</p>
+    </div>
+    <div class="fellow-card fade-in">
+      <div class="fellow-name">Dr. Lana Kazkaz</div>
+      <div class="fellow-role" id="frole4">Scholar, Blanquerna Observatory</div>
+      <p class="fellow-bio" id="fbio4">Journalist and guest professor focusing on hate speech, interfaith dialogue, and religion-media relations in the Middle East. PhD, Ramon Llull University Barcelona.</p>
+    </div>
+    <div class="fellow-card fade-in">
+      <div class="fellow-name">Nagla Abed</div>
+      <div class="fellow-role" id="frole5">Senior Project Leader &amp; M&amp;E Expert</div>
+      <p class="fellow-bio" id="fbio5">20+ years of experience in EU-funded programmes on youth engagement and civil society in the Euro-Mediterranean context. Formerly Anna Lindh Foundation.</p>
+    </div>
+    <div class="fellow-card fade-in">
+      <div class="fellow-name">David Fajolles</div>
+      <div class="fellow-role" id="frole6">Sciences Po Paris &amp; Institut Catholique de Paris</div>
+      <p class="fellow-bio" id="fbio6">Teaches comparative cultural policy, heritage &amp; international relations, and technology foresight at Sciences Po Paris and the Institut Catholique de Paris. Formerly European Union Institute for Security Studies; French Ministers of European Affairs and of Culture. Secretary-General of the French National Commission for UNESCO; Director-General of the Robert de Sorbon Foundation. Graduate of the École normale supérieure; Procter Fellow at Princeton University. Extensive work in Latin America and West Africa in French cultural diplomacy. Co-author of <em>Atlas de l'influence française au XXIe siècle</em> (Robert Laffont).</p>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-header fade-in">
+    <div class="section-label" id="proj-label">Our Work</div>
+    <h2 class="section-title" id="proj-title">Projects &amp; Initiatives</h2>
+  </div>
+  <!-- FIX b): Intro note that projects were led by team members, not CC as organisation -->
+  <p class="projects-intro fade-in" id="proj-intro">The following projects were not carried out by CC as an organisation, but were led or co-managed by members of our team in previous roles — and stand here as examples of the expertise and experience they bring to CC.</p>
+  <div class="projects-grid">
+    <div class="project-card fade-in">
+      <div class="project-bg project-bg-1"></div>
+      <div class="project-content">
+        <span class="project-tag">Media Literacy</span>
+        <div class="project-lead" id="proj-lead1">Led by <span>Dr. Asiem El Difraoui</span></div>
+        <h3 class="project-title">Syria Media Literacy Lab</h3>
+        <p class="project-desc" id="pdesc1">Advanced training for Syrian media professionals in media literacy and combating disinformation. Funded by the German Foreign Office. Amman, November 2025.</p>
+        <a href="https://syria-medialab.com/en/homepage/" class="project-link" target="_blank" id="plink1">Visit Project →</a>
+      </div>
+    </div>
+    <div class="project-card fade-in">
+      <div class="project-bg project-bg-2"></div>
+      <div class="project-content">
+        <span class="project-tag">Digital Innovation</span>
+        <div class="project-lead" id="proj-lead2">Led by <span>Dr. Asiem El Difraoui</span></div>
+        <h3 class="project-title">Digital Sahel</h3>
+        <p class="project-desc" id="pdesc2">Supporting digital transformation for civil society actors in the Sahel region, including training programmes and hybrid initiatives for youth and communities.</p>
+        <a href="https://sites.google.com/leed-initiative.org/digitalsahel/accueil" class="project-link" target="_blank" id="plink2">Visit Project →</a>
+      </div>
+    </div>
+    <div class="project-card fade-in">
+      <div class="project-bg project-bg-3"></div>
+      <div class="project-content">
+        <span class="project-tag">Youth &amp; Culture</span>
+        <div class="project-lead" id="proj-lead3">Led by <span>Dr. Asiem El Difraoui</span></div>
+        <h3 class="project-title">Élan for Europe</h3>
+        <p class="project-desc" id="pdesc3">Promoting creativity and critical thinking by connecting youth and artists across regions, fostering intercultural exchange and collaboration.</p>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-bottom:80px;">
+    <a href="https://media4med.com" class="btn-primary" target="_blank" id="btn-media">Media Literacy for the Mediterranean Consortium →</a>
+  </div>
+  <div class="section-header fade-in" style="margin-bottom:40px;">
+    <div class="section-label" id="pub-label">Selected Publications</div>
+    <h2 class="section-title" style="font-size:clamp(24px,3vw,36px);" id="pub-title">Research &amp; Analysis</h2>
+  </div>
+  <div class="publications-list fade-in">
+    <div class="pub-item"><div class="pub-year">2026</div><div><div class="pub-title">Media Structures, Media Policy and the Challenge of Disinformation in Post-Assad Syria</div><div class="pub-meta">Asiem El Difraoui, Carola Richter, Anja Wollenberg – forthcoming 2026</div></div></div>
+    <div class="pub-item"><div class="pub-year">2025</div><div><div class="pub-title">La Syrie d'al-Charaa est-elle au bord de l'éclatement?</div><div class="pub-meta">El Difraoui, A. – Le Grand Continent, Paris</div></div></div>
+    <div class="pub-item"><div class="pub-year">2025</div><div><div class="pub-title">Le djihadisme politique de la Syrie au Sahel : géopolitique d'une conquête</div><div class="pub-meta">El Difraoui, A. – Études Sécurité, Le Grand Continent, Paris</div></div></div>
+    <div class="pub-item"><div class="pub-year">2025</div><div><div class="pub-title">Pour l'aide internationale, un autre chemin est possible</div><div class="pub-meta">Soto-Mayor, G. with Mame Yacine Diop – IRIS, June 2025</div></div></div>
+    <div class="pub-item"><div class="pub-year">2024</div><div><div class="pub-title">The Economies of Violence: The Forgotten Variable</div><div class="pub-meta">Soto-Mayor, G. – De Gruyter-Brill, Studies in Critical Social Sciences, Vol. 295</div></div></div>
+    <div class="pub-item"><div class="pub-year">2024</div><div><div class="pub-title">Libya, Tunisia and Niger as Case Studies for Counter-Productive Anti-Migration Policies</div><div class="pub-meta">Soto-Mayor, G. – Middle East Institute, May 2024</div></div></div>
+    <div class="pub-item"><div class="pub-year">2022</div><div><div class="pub-title">Geopolitics of the European Rule of Law – Lessons from Ukraine and the Western Balkans</div><div class="pub-meta">Bernard, E. – Intereconomics, Volume 57, No. 4, pp. 229–231</div></div></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="fade-in">
+    <div class="about-label" id="contact-label">Get in Touch</div>
+    <h2 class="contact-title" id="contact-title">Let's Connect Across Cultures</h2>
+    <p class="contact-desc" id="contact-desc">Whether you're interested in research collaboration, project partnership, or media consultancy, we'd love to hear from you.</p>
+    <div class="contact-info-item">
+      <div class="contact-icon">@</div>
+      <div>
+        <div class="contact-detail-label" id="lbl-email">Email</div>
+        <div class="contact-detail-value"><a href="/cdn-cgi/l/email-protection#11706278747c51747d75787763707e64783f7464"><span class="__cf_email__" data-cfemail="bddcced4d8d0fdd8d1d9d4dbcfdcd2c8d493d8c8">[email&#160;protected]</span></a><br><a href="/cdn-cgi/l/email-protection#71181f171e311b10021c181f14121e1f0214181d025f1404"><span class="__cf_email__" data-cfemail="f69f989099b69c97859b9f989395999885939f9a85d89383">[email&#160;protected]</span></a></div>
+      </div>
+    </div>
+    <div class="contact-info-item">
+      <div class="contact-icon">✆</div>
+      <div>
+        <div class="contact-detail-label" id="lbl-phone">Phone</div>
+        <div class="contact-detail-value"><a href="tel:+33607455189">+33 6 07 45 51 89</a></div>
+      </div>
+    </div>
+    <div class="contact-info-item">
+      <div class="contact-icon">◎</div>
+      <div>
+        <div class="contact-detail-label" id="lbl-address">Address</div>
+        <div class="contact-detail-value">1 Rue Albin<br>34390 Saint-Vincent-d'Olargues<br>France</div>
+      </div>
+    </div>
+    <div class="contact-info-item">
+      <div class="contact-icon">🌐</div>
+      <div>
+        <div class="contact-detail-label" id="lbl-web">Website</div>
+        <div class="contact-detail-value"><a href="https://www.asiemeldifraoui.eu/" target="_blank">www.asiemeldifraoui.eu</a></div>
+      </div>
+    </div>
+    <div class="contact-info-item">
+      <div class="contact-icon">◈</div>
+      <div>
+        <div class="contact-detail-label" id="lbl-liaison">EuroMeSCo Liaison Officers</div>
+        <div class="contact-detail-value">Dr. Asiem El Difraoui &amp; Verena Schad<br><a href="/cdn-cgi/l/email-protection#721b1c141d321813011f1b1c17111d1c01171b1e015c1707"><span class="__cf_email__" data-cfemail="1b72757d745b717a687672757e787475687e727768357e6e">[email&#160;protected]</span></a></div>
+      </div>
+    </div>
+  </div>
+  <div class="contact-form fade-in">
+    <div class="form-group">
+      <label class="form-label" id="flbl-name">Your Name</label>
+      <input type="text" class="form-input" placeholder="Dr. Jane Smith">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" placeholder="jane@organisation.org">
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="flbl-topic">Topic</label>
+      <select class="form-select">
+        <option>Research Collaboration</option>
+        <option>Project Partnership</option>
+        <option>Media Consultancy</option>
+        <option>Network &amp; EuroMeSCo</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" id="flbl-msg">Message</label>
+      <textarea class="form-input" placeholder="Tell us about your project or inquiry..."></textarea>
+    </div>
+    <button class="btn-primary" id="form-submit" onclick="handleSubmit()" style="width:100%;border:none;cursor:pointer;">Send Message</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo"><span>CC</span> – Connecting Cultures</div>
+  <ul class="footer-links">
+    <li><a href="#about" id="foot-about">About</a></li>
+    <li><a href="#team" id="foot-team">Team</a></li>
+    <li><a href="#projects" id="foot-projects">Projects</a></li>
+    <li><a href="#contact" id="foot-contact">Contact</a></li>
+    <li><a href="https://www.asiemeldifraoui.eu/" target="_blank">asiemeldifraoui.eu</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 CC – Connecting Cultures · France</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const T = {
+  en: {
+    words: ['Cultures','Continents','Countries','Communities'],
+    'hero-eyebrow':'Independent Consultancy & Think Tank',
+    'hero-connecting':'Connecting',
+    'hero-tagline':'Bridging academic research and practical project management across politics, civil society, and media in the Mediterranean, MENA region, and the Sahel.',
+    'btn-work':'Our Work','btn-touch':'Get in Touch',
+    'nav-about':'About','nav-team':'Team','nav-projects':'Projects','nav-contact':'Contact',
+    'about-label':'Who We Are',
+    'about-title':'A Highly Competent Consultancy at the Crossroads of Cultures',
+    'about-body1':'CC (formerly Jasmine Conseils) bridges academic research and practical project management across politics, civil society, and media. We work at the intersection of geopolitics, digital innovation, and intercultural dialogue to deliver real impact across the Euro-Mediterranean region.',
+    'about-body2':'From countering disinformation to empowering youth and strengthening civil society networks, our expertise spans policy analysis, cross-cultural engagement, and digital innovation across the Mediterranean, MENA, and Sahel regions.',
+    'stat1':'Associate Research Fellows','stat2':'Active International Projects',
+    'stat3':'Regions: Mediterranean · MENA · Sahel','stat4':'Funded Projects incl. German Foreign Office',
+    'team-label':'Our People','team-title':'Leadership & Core Team',
+    'role-asiem':'Founder & Director','role-verena':'Programme Manager',
+    'bio-asiem':'Political scientist and award-winning journalist specialising in propaganda and disinformation. Author of a doctoral thesis on jihadist propaganda; co-author of the Arab Media Handbook. Active in EuroMeSCo for many years.',
+    'bio-verena':"Communications expert and journalist with experience in reputation, crisis, and change management. Formerly worked on Germany's international image and in MENA/Sahel project coordination.",
+    'fellows-label':'Associate Fellows',
+    'frole1':'Senior Data Analyst, PAX','frole2':'President, Egregor','frole3':'ESSEC – Geopolitics Chair','frole4':'Scholar, Blanquerna Observatory','frole5':'Senior Project Leader & M&E Expert','frole6':'Sciences Po Paris & Institut Catholique de Paris',
+    'fbio1':'Specialising in online mis/disinformation, extremism, AI regulation, and Protection of Civilians policies. Contributor to media literacy projects with the European Institute of the Mediterranean.',
+    'fbio2':'Expert in political and security issues in Africa and Europe, with field research on religious, social violence, disinformation, and hate speech.',
+    'fbio3':'Doctor in public law (Sorbonne Paris III), expert for international organisations since 2021, member of a CNRS scientific committee.',
+    'fbio4':'Journalist and guest professor focusing on hate speech, interfaith dialogue, and religion-media relations in the Middle East. PhD, Ramon Llull University Barcelona.',
+    'fbio5':'20+ years of experience in EU-funded programmes on youth engagement and civil society in the Euro-Mediterranean context. Formerly Anna Lindh Foundation.',
+    'fbio6':'Teaches comparative cultural policy, heritage & international relations, and technology foresight at Sciences Po Paris and the Institut Catholique de Paris. Formerly EU Institute for Security Studies; French Ministers of European Affairs and of Culture. Secretary-General of the French National Commission for UNESCO; Director-General of the Robert de Sorbon Foundation. Graduate of the École normale supérieure; Procter Fellow at Princeton. Co-author of Atlas de l\'influence française au XXIe siècle (Robert Laffont).',
+    'proj-label':'Our Work','proj-title':'Projects & Initiatives',
+    'proj-intro':'The following projects were not carried out by CC as an organisation, but were led or co-managed by members of our team in previous roles — and stand here as examples of the expertise and experience they bring to CC.',
+    'proj-lead1':'Led by Dr. Asiem El Difraoui',
+    'proj-lead2':'Led by Dr. Asiem El Difraoui',
+    'proj-lead3':'Led by Dr. Asiem El Difraoui',
+    'pdesc1':'Advanced training for Syrian media professionals in media literacy and combating disinformation. Funded by the German Foreign Office. Amman, November 2025.',
+    'pdesc2':'Supporting digital transformation for civil society actors in the Sahel region, including training programmes and hybrid initiatives.',
+    'pdesc3':'Promoting creativity and critical thinking by connecting youth and artists across regions, fostering intercultural exchange.',
+    'plink1':'Visit Project →','plink2':'Visit Project →',
+    'btn-media':'Media Literacy for the Mediterranean Consortium →',
+    'pub-label':'Selected Publications','pub-title':'Research & Analysis',
+    'contact-label':'Get in Touch','contact-title':"Let's Connect Across Cultures",
+    'contact-desc':"Whether you're interested in research collaboration, project partnership, or media consultancy, we'd love to hear from you.",
+    'lbl-email':'Email','lbl-phone':'Phone','lbl-address':'Address','lbl-web':'Website','lbl-liaison':'EuroMeSCo Liaison Officers',
+    'flbl-name':'Your Name','flbl-topic':'Topic','flbl-msg':'Message','form-submit':'Send Message',
+    'foot-about':'About','foot-team':'Team','foot-projects':'Projects','foot-contact':'Contact'
+  },
+  fr: {
+    words: ['Cultures','Continents','Pays','Communautés'],
+    'hero-eyebrow':'Consultance Indépendante & Think Tank',
+    'hero-connecting':'Connecter les',
+    'hero-tagline':'Connecter la recherche académique et la gestion de projets à travers la politique, la société civile et les médias en Méditerranée, dans la région MENA et au Sahel.',
+    'btn-work':'Nos Projets','btn-touch':'Nous Contacter',
+    'nav-about':'À propos','nav-team':'Équipe','nav-projects':'Projets','nav-contact':'Contact',
+    'about-label':'Qui Nous Sommes',
+    'about-title':'Un Cabinet de Conseil de Haut Niveau au Carrefour des Cultures',
+    'about-body1':"CC (anciennement Jasmine Conseils) relie la recherche académique et la gestion de projets dans les domaines de la politique, de la société civile et des médias. Nous travaillons à l'intersection de la géopolitique, de l'innovation numérique et du dialogue interculturel.",
+    'about-body2':"De la lutte contre la désinformation à l'autonomisation des jeunes, notre expertise couvre l'analyse politique, l'engagement interculturel et l'innovation numérique en Méditerranée, dans la région MENA et au Sahel.",
+    'stat1':'Chercheurs Associés','stat2':'Projets Internationaux Actifs',
+    'stat3':'Régions : Méditerranée · MENA · Sahel','stat4':"Projets financés par l'UE et le MAE allemand",
+    'team-label':'Notre Équipe','team-title':'Direction & Équipe Principale',
+    'role-asiem':'Fondateur & Directeur','role-verena':'Responsable de Programme',
+    'bio-asiem':"Politologue et journaliste primé spécialisé dans la propagande et la désinformation. Auteur d'une thèse de doctorat sur la propagande djihadiste ; co-auteur du Arab Media Handbook.",
+    'bio-verena':"Experte en communication et journaliste avec une expérience en gestion de réputation, de crise et du changement. A travaillé sur l'image internationale de l'Allemagne.",
+    'fellows-label':'Chercheurs Associés',
+    'frole1':'Analyste de données, PAX','frole2':'Président, Egregor','frole3':'ESSEC – Chaire Géopolitique','frole4':'Chercheuse, Observatoire Blanquerna','frole5':'Chef de Projet Senior & Experte S&E','frole6':'Sciences Po Paris & Institut Catholique de Paris',
+    'fbio1':"Spécialisé en désinformation en ligne, extrémisme, régulation de l'IA et protection des civils.",
+    'fbio2':'Expert en questions politiques et sécuritaires en Afrique et en Europe.',
+    'fbio3':"Docteure en droit public (Sorbonne Paris III), experte pour des organisations internationales depuis 2021.",
+    'fbio4':'Journaliste et professeure invitée spécialisée dans les discours de haine et le dialogue interreligieux au Moyen-Orient.',
+    'fbio5':"Plus de 20 ans d'expérience dans des programmes financés par l'UE. Anciennement Fondation Anna Lindh.",
+    'fbio6':"Enseigne la politique culturelle comparée, le patrimoine et les relations internationales à Sciences Po Paris et à l'Institut Catholique de Paris. Ancien collaborateur de l'Institut d'études de sécurité de l'UE ; anciens ministres français des Affaires européennes et de la Culture. Secrétaire général de la Commission nationale française pour l'UNESCO ; directeur général de la Fondation Robert de Sorbon. Ancien élève de l'École normale supérieure ; Procter Fellow à Princeton. Co-auteur de l'Atlas de l'influence française au XXIe siècle (Robert Laffont).",
+    'proj-label':'Notre Travail','proj-title':'Projets & Initiatives',
+    'proj-intro':"Les projets suivants n'ont pas été réalisés par CC en tant qu'organisation, mais ont été dirigés ou co-gérés par des membres de notre équipe dans des rôles antérieurs — et illustrent ici l'expertise et l'expérience qu'ils apportent à CC.",
+    'proj-lead1':'Dirigé par Dr. Asiem El Difraoui',
+    'proj-lead2':'Dirigé par Dr. Asiem El Difraoui',
+    'proj-lead3':'Dirigé par Dr. Asiem El Difraoui',
+    'pdesc1':'Formation avancée pour les professionnels des médias syriens. Financé par le Ministère des Affaires étrangères allemand. Amman, novembre 2025.',
+    'pdesc2':'Soutenir la transformation numérique des acteurs de la société civile au Sahel.',
+    'pdesc3':'Promouvoir la créativité et la pensée critique en connectant jeunes et artistes.',
+    'plink1':'Voir le projet →','plink2':'Voir le projet →',
+    'btn-media':'Consortium Médias pour la Méditerranée →',
+    'pub-label':'Publications Sélectionnées','pub-title':'Recherche & Analyse',
+    'contact-label':'Contactez-Nous','contact-title':'Connectons-Nous à Travers les Cultures',
+    'contact-desc':'Que vous soyez intéressé par une collaboration de recherche, un partenariat ou une consultation médias, nous serions ravis de vous entendre.',
+    'lbl-email':'Email','lbl-phone':'Téléphone','lbl-address':'Adresse','lbl-web':'Site web','lbl-liaison':'Responsables EuroMeSCo',
+    'flbl-name':'Votre Nom','flbl-topic':'Sujet','flbl-msg':'Message','form-submit':'Envoyer',
+    'foot-about':'À propos','foot-team':'Équipe','foot-projects':'Projets','foot-contact':'Contact'
+  },
+  de: {
+    words: ['Kulturen','Kontinente','Länder','Gemeinschaften'],
+    'hero-eyebrow':'Unabhängige Beratung & Denkfabrik',
+    'hero-connecting':'Verbinden von',
+    'hero-tagline':'Wir verbinden akademische Forschung mit praktischem Projektmanagement in Politik, Zivilgesellschaft und Medien – im Mittelmeerraum, der MENA-Region und der Sahelzone.',
+    'btn-work':'Unsere Arbeit','btn-touch':'Kontakt aufnehmen',
+    'nav-about':'Über uns','nav-team':'Team','nav-projects':'Projekte','nav-contact':'Kontakt',
+    'about-label':'Wer Wir Sind',
+    'about-title':'Eine hochkompetente Beratung an der Schnittstelle der Kulturen',
+    'about-body1':'CC (ehemals Jasmine Conseils) verbindet akademische Forschung mit praktischem Projektmanagement in Politik, Zivilgesellschaft und Medien. Wir arbeiten an der Schnittstelle von Geopolitik, digitaler Innovation und interkulturellem Dialog.',
+    'about-body2':'Von der Bekämpfung von Desinformation bis zur Stärkung der Zivilgesellschaft: Unsere Expertise umfasst Politikanalyse, interkulturelles Engagement und digitale Innovation im Mittelmeerraum, der MENA-Region und der Sahelzone.',
+    'stat1':'Assoziierte Forschende','stat2':'Aktive internationale Projekte',
+    'stat3':'Regionen: Mittelmeer · MENA · Sahel','stat4':'EU-geförderte Projekte inkl. Auswärtiges Amt',
+    'team-label':'Unser Team','team-title':'Führung & Kernteam',
+    'role-asiem':'Gründer & Direktor','role-verena':'Programmleiterin',
+    'bio-asiem':'Politikwissenschaftler und preisgekrönter Journalist mit Schwerpunkt Propaganda und Desinformation. Autor einer Doktorarbeit über dschihadistische Propaganda; Mitautor des Arab Media Handbook.',
+    'bio-verena':'Kommunikationsexpertin und Journalistin mit Erfahrung in Reputations-, Krisen- und Change-Management. Zuvor tätig für das internationale Image Deutschlands.',
+    'fellows-label':'Assoziierte Fellows',
+    'frole1':'Senior Data Analyst, PAX','frole2':'Präsident, Egregor','frole3':'ESSEC – Geopolitik-Lehrstuhl','frole4':'Wissenschaftlerin, Blanquerna Observatorium','frole5':'Senior Projektleiterin & M&E-Expertin','frole6':'Sciences Po Paris & Institut Catholique de Paris',
+    'fbio1':'Spezialisiert auf Online-Desinformation, Extremismus, KI-Regulierung und Schutz von Zivilisten.',
+    'fbio2':'Experte für politische und Sicherheitsfragen in Afrika und Europa.',
+    'fbio3':'Doktorin im öffentlichen Recht (Sorbonne Paris III), Expertin für internationale Organisationen seit 2021.',
+    'fbio4':'Journalistin und Gastprofessorin mit Schwerpunkt Hassrede und interreligiöser Dialog im Nahen Osten.',
+    'fbio5':'20+ Jahre Erfahrung in EU-geförderten Programmen zu Jugendengagement. Zuvor Anna Lindh Stiftung.',
+    'fbio6':'Lehrt vergleichende Kulturpolitik, Kulturerbe & internationale Beziehungen sowie Technologiepolitik an Sciences Po Paris und dem Institut Catholique de Paris. Ehemals EU-Institut für Sicherheitsstudien; französische Ministerien für Europäische Angelegenheiten und Kultur. Generalsekretär der Französischen Nationalkommission für die UNESCO; Generaldirektor der Robert de Sorbon-Stiftung. Absolvent der École normale supérieure; Procter Fellow in Princeton. Mitautor des Atlas de l\'influence française au XXIe siècle (Robert Laffont).',
+    'proj-label':'Unsere Arbeit','proj-title':'Projekte & Initiativen',
+    'proj-intro':'Die folgenden Projekte wurden nicht von CC als Organisation durchgeführt, sondern von Mitgliedern unseres Teams in früheren Rollen geleitet oder mitverantwortet – und stehen hier beispielhaft für die Expertise und Erfahrung, die sie in CC einbringen.',
+    'proj-lead1':'Geleitet von Dr. Asiem El Difraoui',
+    'proj-lead2':'Geleitet von Dr. Asiem El Difraoui',
+    'proj-lead3':'Geleitet von Dr. Asiem El Difraoui',
+    'pdesc1':'Fortgeschrittene Schulungen für syrische Medienschaffende. Gefördert vom Auswärtigen Amt. Amman, November 2025.',
+    'pdesc2':'Unterstützung der digitalen Transformation für Zivilgesellschaftsakteure in der Sahelzone.',
+    'pdesc3':'Förderung von Kreativität und kritischem Denken durch Vernetzung von Jugendlichen und Künstlern.',
+    'plink1':'Zum Projekt →','plink2':'Zum Projekt →',
+    'btn-media':'Konsortium Medienkompetenz Mittelmeer →',
+    'pub-label':'Ausgewählte Publikationen','pub-title':'Forschung & Analyse',
+    'contact-label':'Kontakt','contact-title':'Lass uns kulturübergreifend verbinden',
+    'contact-desc':'Ob Forschungskooperation, Projektpartnerschaft oder Medienberatung – wir freuen uns, von Ihnen zu hören.',
+    'lbl-email':'E-Mail','lbl-phone':'Telefon','lbl-address':'Adresse','lbl-web':'Website','lbl-liaison':'EuroMeSCo-Ansprechpartner',
+    'flbl-name':'Ihr Name','flbl-topic':'Thema','flbl-msg':'Nachricht','form-submit':'Senden',
+    'foot-about':'Über uns','foot-team':'Team','foot-projects':'Projekte','foot-contact':'Kontakt'
+  },
+  ar: {
+    words: ['الثقافات','القارات','الدول','المجتمعات'],
+    'hero-eyebrow':'استشارات مستقلة ومركز أبحاث',
+    'hero-connecting':'ربط',
+    'hero-tagline':'ربط البحث الأكاديمي بالإدارة العملية للمشاريع عبر السياسة والمجتمع المدني والإعلام في منطقة البحر الأبيض المتوسط والشرق الأوسط وأفريقيا جنوب الصحراء.',
+    'btn-work':'عملنا','btn-touch':'تواصل معنا',
+    'nav-about':'عنّا','nav-team':'الفريق','nav-projects':'المشاريع','nav-contact':'تواصل',
+    'about-label':'من نحن',
+    'about-title':'استشارات متميزة عند تقاطع الثقافات',
+    'about-body1':'CC (المعروف سابقًا باسم Jasmine Conseils) يربط البحث الأكاديمي بالإدارة العملية للمشاريع في مجالات السياسة والمجتمع المدني والإعلام.',
+    'about-body2':'من مكافحة التضليل الإعلامي إلى تمكين الشباب، تمتد خبرتنا عبر منطقة البحر الأبيض المتوسط والشرق الأوسط وأفريقيا جنوب الصحراء.',
+    'stat1':'باحثون مشاركون','stat2':'مشاريع دولية نشطة',
+    'stat3':'مناطق: المتوسط · الشرق الأوسط · الساحل','stat4':'مشاريع ممولة من الاتحاد الأوروبي',
+    'team-label':'فريقنا','team-title':'القيادة والفريق الأساسي',
+    'role-asiem':'المؤسس والمدير','role-verena':'مديرة البرامج',
+    'bio-asiem':'عالم سياسي وصحفي حائز على جوائز متخصص في الدعاية والتضليل الإعلامي.',
+    'bio-verena':'خبيرة في الاتصالات والصحافة مع خبرة في إدارة السمعة والأزمات.',
+    'fellows-label':'الباحثون المشاركون',
+    'frole1':'محلل بيانات أول، PAX','frole2':'رئيس، Egregor','frole3':'ESSEC – كرسي الجيوسياسة','frole4':'باحثة، مرصد بلانكيرنا','frole5':'قائدة مشاريع أولى وخبيرة رصد وتقييم','frole6':'Sciences Po Paris والمعهد الكاثوليكي بباريس',
+    'fbio1':'متخصص في التضليل الإعلامي الإلكتروني والتطرف وتنظيم الذكاء الاصطناعي.',
+    'fbio2':'خبير في القضايا السياسية والأمنية في أفريقيا وأوروبا.',
+    'fbio3':'دكتوراه في القانون العام، خبيرة للمنظمات الدولية منذ 2021.',
+    'fbio4':'صحفية وأستاذة زائرة متخصصة في خطاب الكراهية والحوار بين الأديان.',
+    'fbio5':'أكثر من 20 عامًا من الخبرة في البرامج الممولة من الاتحاد الأوروبي. سابقًا في مؤسسة آنا ليند.',
+    'fbio6':'يُدرّس السياسة الثقافية المقارنة والتراث والعلاقات الدولية في Sciences Po Paris والمعهد الكاثوليكي. عمل سابقًا في معهد الدراسات الأمنية للاتحاد الأوروبي ووزارتَي الشؤون الأوروبية والثقافة الفرنسيتين. أمين عام اللجنة الوطنية الفرنسية لليونسكو؛ مدير عام مؤسسة روبير دو سوربون. خريج École normale supérieure؛ زميل بروكتر في جامعة برينستون. شارك في تأليف أطلس النفوذ الفرنسي في القرن الحادي والعشرين (دار روبير لافون).',
+    'proj-label':'عملنا','proj-title':'المشاريع والمبادرات',
+    'proj-intro':'المشاريع التالية لم تُنفَّذ من قِبَل CC كمنظمة، بل قادها أو شارك في إدارتها أعضاء فريقنا في أدوار سابقة — وتُعرض هنا كأمثلة على الخبرة التي يجلبونها إلى CC.',
+    'proj-lead1':'بقيادة د. عاصم الديفراوي',
+    'proj-lead2':'بقيادة د. عاصم الديفراوي',
+    'proj-lead3':'بقيادة د. عاصم الديفراوي',
+    'pdesc1':'تدريب متقدم للإعلاميين السوريين في محو الأمية الإعلامية ومكافحة التضليل. بتمويل من وزارة الخارجية الألمانية.',
+    'pdesc2':'دعم التحول الرقمي لفاعلي المجتمع المدني في منطقة الساحل.',
+    'pdesc3':'تعزيز الإبداع والتفكير النقدي من خلال ربط الشباب والفنانين عبر المناطق.',
+    'plink1':'زيارة المشروع ←','plink2':'زيارة المشروع ←',
+    'btn-media':'تحالف محو الأمية الإعلامية للبحر الأبيض المتوسط ←',
+    'pub-label':'منشورات مختارة','pub-title':'البحث والتحليل',
+    'contact-label':'تواصل معنا','contact-title':'لنتواصل عبر الثقافات',
+    'contact-desc':'سواء كنت مهتمًا بالتعاون البحثي أو الشراكة في المشاريع أو الاستشارات الإعلامية، نود أن نسمع منك.',
+    'lbl-email':'البريد الإلكتروني','lbl-phone':'هاتف','lbl-address':'العنوان','lbl-web':'الموقع','lbl-liaison':'ضباط الاتصال EuroMeSCo',
+    'flbl-name':'اسمك','flbl-topic':'الموضوع','flbl-msg':'الرسالة','form-submit':'إرسال',
+    'foot-about':'عنّا','foot-team':'الفريق','foot-projects':'المشاريع','foot-contact':'تواصل'
+  }
+};
+
+let currentLang = 'en';
+function setLang(lang) {
+  currentLang = lang;
+  const t = T[lang];
+  ['en','fr','de','ar'].forEach(l => document.getElementById('btn-'+l).classList.toggle('active', l===lang));
+  Object.keys(t).forEach(id => {
+    if (id === 'words') return;
+    const el = document.getElementById(id);
+    if (el) el.textContent = t[id];
+  });
+  document.body.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', lang);
+  document.getElementById('rotWord').textContent = t.words[wordIdx];
+}
+
+let wordIdx = 0;
+const rotEl = document.getElementById('rotWord');
+setTimeout(() => rotEl.classList.add('show'), 300);
+
+function cycleWord() {
+  rotEl.classList.remove('show');
+  rotEl.classList.add('hide');
+  setTimeout(() => {
+    wordIdx = (wordIdx + 1) % 4;
+    rotEl.textContent = T[currentLang].words[wordIdx];
+    rotEl.classList.remove('hide');
+    rotEl.classList.add('show');
+  }, 450);
+}
+setInterval(cycleWord, 1800);
+
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+function handleSubmit() {
+  const btn = document.getElementById('form-submit');
+  btn.textContent = '✓ Sent!';
+  btn.style.background = '#8B9E5A';
+  setTimeout(() => {
+    btn.textContent = T[currentLang]['form-submit'];
+    btn.style.background = '';
+  }, 3000);
+}
+
+setLang('en');
+</script>
+</body>
+</html>
