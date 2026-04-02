@@ -680,4 +680,16 @@ const obs = new IntersectionObserver(entries => {
 document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
 function handleSubmit() {
-  const btn = document.getElemen
+  const btn = document.getElementById('form-submit');
+  btn.textContent = '✓ Sent!';
+  btn.style.background = '#8B9E5A';
+  setTimeout(() => {
+    btn.textContent = T[currentLang]['form-submit'];
+    btn.style.background = '';
+  }, 3000);
+}
+
+setLang('en');
+</script>
+</body>
+</html>
